@@ -1,11 +1,11 @@
 // src/components/Table/TableRow.js
 import React from 'react';
 
-function TableRow({ data, onEdit, onDelete }) {
+function TableRow({ data, columns, onEdit, onDelete }) {
   return (
     <tr>
-      {Object.values(data).map((value, index) => (
-        <td key={index}>{value}</td>
+      {columns.map((column) => (
+        <td key={column.name}>{data[column.name]}</td>
       ))}
       <td>
         <button onClick={() => onEdit(data)}>Editar</button>

@@ -9,14 +9,23 @@ function Table({ columns, data, onEdit, onDelete }) {
     <table className="custom-table">
       <TableHeader columns={columns} />
       <tbody>
-        {data.map((item) => (
-          <TableRow
-            key={item.id}
-            data={item}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
-        ))}
+        {data.length === 0 ? (
+          <tr>
+            <td colSpan={columns.length} className="no-data">
+              No hay elementos
+            </td>
+          </tr>
+        ) : (
+          data.map((item) => (
+            <TableRow
+              key={item.id}
+              data={item}
+              columns={columns} // Pasa las columnas a TableRow para formatear correctamente
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          ))
+        )}
       </tbody>
     </table>
   );

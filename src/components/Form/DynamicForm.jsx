@@ -31,6 +31,7 @@ function DynamicForm({ schema, initialData = {}, onSubmit }) {
             onChange={handleChange}
             placeholder={field.placeholder || ''}
             required={field.required || false}
+            initialData={initialData ? initialData : {}}
           />
         </div>
       ))}
