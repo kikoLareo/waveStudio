@@ -6,7 +6,7 @@ import DynamicForm from '../components/Form/DynamicForm';
 import {roleSchema} from '../schemas/schemas';
 import api from '../services/api';
 
-export const Roles = () => {
+const Roles = () => {
   const [roles, setRoles] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
   const [currentRole, setCurrentRole] = useState(null);
@@ -60,3 +60,4 @@ export const Roles = () => {
   );
 }
 
+export default Roles; 

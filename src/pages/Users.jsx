@@ -6,7 +6,9 @@ import DynamicForm from '../components/Form/DynamicForm';
 import {userCreateSchema, userUpdateSchema} from '../schemas/schemas';
 import api from '../services/api';
 import logService from '../utils/logger';
-export const Users = () => {
+
+
+const Users = () => {
   const [users, setUsers] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -77,3 +79,4 @@ export const Users = () => {
   );
 }
 
+export default Users;
