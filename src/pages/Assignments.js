@@ -31,7 +31,7 @@ const Assignments = () => {
 
   const handleDelete = async (id) => {
     try {
-      await api.delete(`/assignments/${id}/delete`);
+      await api.delete(`/assignments/delete/${id}`);
       fetchAssignments();
     } catch (error) {
       logService.log('error', 'Error al eliminar la asignación', error);

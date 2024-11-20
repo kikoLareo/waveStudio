@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.scss';
+import ThemeToggle from '../ThemeToogle/ThemeToggle';
 
 function Navbar() {
   // Estado para controlar el menú desplegable
@@ -25,6 +26,8 @@ function Navbar() {
     <nav className="navbar">
       <h1>WaveStudio</h1>
       {/* Icono de menú con eventos onClick y onMouseEnter */}
+     
+      <ThemeToggle />
       <button
         className="menu-toggle"
         onClick={toggleMenu}
@@ -55,6 +58,13 @@ function Navbar() {
         </li>
         <li>
           <Link to="/job-positions" onClick={toggleMenu}>Puestos de Trabajo</Link>
+        </li>
+
+        <li>
+          <Link to="/organizers" onClick={toggleMenu}>Organizadores</Link>
+        </li>
+        <li>
+          <Link to="/disciplines" onClick={toggleMenu}>Disciplinas</Link>
         </li>
       </ul>
     </nav>

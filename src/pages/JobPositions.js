@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Table from '../components/Table/Table';
 import Modal from '../components/Modal/Modal';
 import DynamicForm from '../components/Form/DynamicForm';
-import { jobPositionCreateSchema, jobPositionUpdateSchema } from '../schemas/schemas';
+import { jobPositions } from '../schemas/schemas';
 import api from '../services/api';
 import logService from '../utils/logger';
 
@@ -11,7 +11,7 @@ const JobPositions = () => {
   const [jobPositions, setJobPositions] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
   const [currentJobPosition, setCurrentJobPosition] = useState(null);
-  const [schema, setSchema] = useState(jobPositionCreateSchema);
+  const [schema, setSchema] = useState(jobPositions);
 
   useEffect(() => {
     fetchJobPositions();
@@ -22,20 +22,20 @@ const JobPositions = () => {
     setJobPositions(response.data);
   };
 
-  const handleEdit = (jobPosition) => {
-    setCurrentJobPosition(jobPosition);
-    setSchema(jobPositionUpdateSchema);
+  const handleEdit = (jobPositions) => {
+    setCurrentJobPosition(jobPositions);
+    setSchema(jobPositions);
     setModalOpen(true);
   };
 
   const handleDelete = async (id) => {
-    await api.delete(`/job-positions/${id}/delete`);
+    await api.delete(`/job-positions/delete/${id}`);
     fetchJobPositions();
   };
 
   const handleCreate = () => {
     setCurrentJobPosition({});
-    setSchema(jobPositionCreateSchema);
+    setSchema(jobPositions);
     setModalOpen(true);
   };
 

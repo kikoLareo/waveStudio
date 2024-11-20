@@ -1,58 +1,40 @@
-export const userUpdateSchema = [
-    { name: 'username', label: 'Nombre de Usuario', type: 'text', required: true },
-    { name: 'email', label: 'Email', type: 'email', required: true },
-  ];
+export const users = [
+  { name: 'username', label: 'Nombre de Usuario', type: 'text', required: true },
+  { name: 'email', label: 'Email', type: 'email', required: true },
+  { name: 'password', label: 'Contraseña', type: 'password', required: false },
+];
 
-export const userCreateSchema = [
-    { name: 'username', label: 'Nombre de Usuario', type: 'text', required: true },
-    { name: 'email', label: 'Email', type: 'email', required: true },
-    { name: 'password', label: 'Contraseña', type: 'password', required: true },
-  ];
-  
- export const roleSchema = [
-    { name: 'name', label: 'Nombre del Rol', type: 'text', required: true },
-    { name: 'description', label: 'Descripción', type: 'text' },
-  ];
+export const roles = [
+  { name: 'name', label: 'Nombre del Rol', type: 'text', required: true },
+  { name: 'description', label: 'Descripción', type: 'text', required: false },
+];
 
-
-// Esquema para crear un Campeonato
-export const championshipCreateSchema = [
+export const championships = [
   { name: 'name', label: 'Nombre del Campeonato', type: 'text', required: true },
   { name: 'location', label: 'Ubicación', type: 'text', required: true },
-  { name: 'date', label: 'Fecha', type: 'date', required: true },
+  { name: 'organizer', label: 'Organizador', type: 'bdComponent', required: true, bdComponent: 'organizers' },
+  { name: 'discipline', label: 'Disciplina', type: 'bdComponent', required: true, bdComponent: 'disciplines' },
+  { name: 'startDate', label: 'Fecha de Inicio', type: 'date', required: true },
+  { name: 'endDate', label: 'Fecha de Fin', type: 'date', required: true },
 ];
 
-// Esquema para actualizar un Campeonato
-export const championshipUpdateSchema = [
-  { name: 'name', label: 'Nombre del Campeonato', type: 'text', required: true },
-  { name: 'location', label: 'Ubicación', type: 'text', required: true },
-  { name: 'date', label: 'Fecha', type: 'date', required: true },
-];
-
-// Esquema para crear un Puesto de Trabajo
-export const jobPositionCreateSchema = [
+export const jobPositions = [
   { name: 'title', label: 'Título del Puesto', type: 'text', required: true },
-  { name: 'description', label: 'Descripción', type: 'text' },
+  { name: 'description', label: 'Descripción', type: 'text', required: false },
 ];
 
-// Esquema para actualizar un Puesto de Trabajo
-export const jobPositionUpdateSchema = [
-  { name: 'title', label: 'Título del Puesto', type: 'text', required: true },
-  { name: 'description', label: 'Descripción', type: 'text' },
-];
-
-// Esquema para la asignación de usuarios a campeonatos
-export const championshipAssignmentCreateSchema = [
-  { name: 'user_id', label: 'ID del Usuario', type: 'number', required: true },
-  { name: 'championship_id', label: 'ID del Campeonato', type: 'number', required: true },
-  { name: 'job_position_id', label: 'ID del Puesto de Trabajo', type: 'number', required: true },
+export const championshipAssignments = [
+  { name: 'user_id', label: 'Usuario', type: 'bdComponent', required: true, bdComponent: 'users' },
+  { name: 'championship_id', label: 'Campeonato', type: 'bdComponent', required: true, bdComponent: 'championships' },
+  { name: 'job_position_id', label: 'Puesto de Trabajo', type: 'bdComponent', required: true, bdComponent: 'job_positions' },
   { name: 'hours_worked', label: 'Horas Trabajadas', type: 'number', required: true },
 ];
 
-// Esquema para actualizar una asignación (puede ser igual al de creación)
-export const championshipAssignmentUpdateSchema = [
-  { name: 'user_id', label: 'ID del Usuario', type: 'number', required: true },
-  { name: 'championship_id', label: 'ID del Campeonato', type: 'number', required: true },
-  { name: 'job_position_id', label: 'ID del Puesto de Trabajo', type: 'number', required: true },
-  { name: 'hours_worked', label: 'Horas Trabajadas', type: 'number', required: true },
+export const organizers = [
+  { name: 'name', label: 'Nombre del Organizador', type: 'text', required: true },
+];
+
+export const disciplines = [
+  { name: 'name', label: 'Nombre de la Disciplina', type: 'text', required: true },
+  { name: 'category', label: 'Categoría', type: 'text', required: false },
 ];

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Table from '../components/Table/Table';
 import Modal from '../components/Modal/Modal';
 import DynamicForm from '../components/Form/DynamicForm';
-import {roleSchema} from '../schemas/schemas';
+import {roles} from '../schemas/schemas';
 import api from '../services/api';
 
 const Roles = () => {
@@ -20,8 +20,8 @@ const Roles = () => {
     setRoles(response.data);
   };
 
-  const handleEdit = (role) => {
-    setCurrentRole(role);
+  const handleEdit = (roles) => {
+    setCurrentRole(roles);
     setModalOpen(true);
   };
 
@@ -45,14 +45,14 @@ const Roles = () => {
       <h1>Gestión de Roles</h1>
       <button onClick={() => setModalOpen(true)}>Crear Rol</button>
       <Table
-        columns={roleSchema}
+        columns={roles}
         data={roles}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
       <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
         <DynamicForm
-          schema={roleSchema}
+          schema={roles}
           onSubmit={handleFormSubmit}
         />
       </Modal>

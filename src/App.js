@@ -3,7 +3,10 @@ import React from 'react';
 import Navbar from './components/Navbar/NavBar'; // Asegúrate de que la ruta y el nombre del archivo sean correctos
 import ErrorBoundary from './components/Boundary/ErrorBoundary'; // Asegúrate de que la ruta y el nombre del archivo sean correctos
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import routes from './routes';
 
+
+import ChampionshipDetail from './pages/ChampionshipDetailPage';
 import Dashboard from './pages/Dashboard';
 import Roles from './pages/Roles';
 import Users from './pages/Users';
@@ -18,15 +21,10 @@ function App() {
       <div className="App">
         <Navbar />
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/roles" element={<Roles />} />
-          <Route path="/users" element={<Users />} />
-          <Route path="/championships" element={<Championships />} />
-          <Route path="/assignments" element={<Assignments />} />
-          <Route path="/job-positions" element={<JobPositions />} />
+        {routes.map(({ path, element }, index) => (
+          <Route key={index} path={path} element={element} />
+        ))}
       </Routes>
-        {/* Agrega otros componentes aquí */}
-        <h1>¡Bienvenido a WaveStudio!</h1>
       </div>
     </ErrorBoundary>
     </Router>
