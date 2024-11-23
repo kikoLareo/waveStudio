@@ -1,7 +1,7 @@
 // src/routes.js
 import React from 'react';
 import GenericPage from './pages/GenericPage';
-import {users ,roles,  championships,  jobPositions,  organizers,  disciplines} from './schemas/schemas';
+import {users ,roles,  championships,  jobPositions,  organizers,  disciplines, championshipAssignments} from './schemas/schemas';
 
 const routes = [
   {
@@ -64,6 +64,16 @@ const routes = [
       />
     ),
   },
+    {
+      path: 'assignments',
+      element: (
+        <GenericPage
+          entityName="Asignación de Campeonato"
+          fetchUrl="/championship-assignments"
+          createSchema={championshipAssignments}
+        />
+      ),
+    }
 ];
 
 export default routes;
