@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/waveStudio/static/css/main.bcb4447d.css",
-    "main.js": "/waveStudio/static/js/main.adeb1600.js",
+    "main.js": "/waveStudio/static/js/main.0a85bac0.js",
     "index.html": "/waveStudio/index.html",
     "main.bcb4447d.css.map": "/waveStudio/static/css/main.bcb4447d.css.map",
-    "main.adeb1600.js.map": "/waveStudio/static/js/main.adeb1600.js.map"
+    "main.0a85bac0.js.map": "/waveStudio/static/js/main.0a85bac0.js.map"
   },
   "entrypoints": [
     "static/css/main.bcb4447d.css",
-    "static/js/main.adeb1600.js"
+    "static/js/main.0a85bac0.js"
   ]
 }
