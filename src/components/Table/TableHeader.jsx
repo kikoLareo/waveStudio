@@ -1,14 +1,14 @@
-// src/components/Table/TableHeader.js
+// src/components/Table/TableHeader.jsx
 import React from 'react';
+import './Table.scss';
 
 function TableHeader({ columns }) {
   return (
     <thead>
       <tr>
-        {columns.map((column, index) => (
-          <th key={index}>{column.label}</th>
+        {columns.map((col) => (
+          <th key={col.name}>{col.label}</th>
         ))}
-        <th>Acciones</th>
       </tr>
     </thead>
   );

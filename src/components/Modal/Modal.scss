@@ -24,6 +24,46 @@
         border: none;
         font-size: 1.5rem;
         cursor: pointer;
+        color: #000;
+
+        &:hover {
+          color: #007bff;
+        }
       }
+
     }
   }
+
+
+.deleteBtn-container {
+  display: flex;
+  flex-direction: row-reverse;
+  width: 100%;
+  justify-content: space-between;
+
+  .btn-danger {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #dc3545; /* Rojo para hover */
+
+  }
+  
+  .btn-danger:hover {
+    color: #ffffff; /* Rojo para hover */
+    background-color: #dc3545;
+  }
+  
+  .icon-only {
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .icon-only:hover {
+    background-color: rgba(220, 53, 69, 0.1); /* Fondo suave para hover */
+  }
+}

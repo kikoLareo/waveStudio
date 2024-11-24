@@ -1,6 +1,7 @@
 // src/components/Modal/Modal.js
 import React from 'react';
 import './Modal.scss'; // Asegúrate de tener estilos básicos
+import { FaWindowClose } from 'react-icons/fa';
 
 function Modal({ isOpen, onClose, children }) {
   if (!isOpen) return null;
@@ -9,7 +10,7 @@ function Modal({ isOpen, onClose, children }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-button" onClick={onClose}>
-          X
+          <FaWindowClose />
         </button>
         {children}
       </div>

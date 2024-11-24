@@ -4,6 +4,16 @@ export const users = [
   { name: 'password', label: 'Contraseña', type: 'password', required: false },
 ];
 
+// src/schemas/schemas.js
+export const userUpdateSchema = [
+  { name: 'username', label: 'Nombre de Usuario', type: 'text', required: true },
+  { name: 'email', label: 'Email', type: 'email', required: true },
+  { name: 'currentPassword', label: 'Contraseña Actual', type: 'password', required: true },
+  { name: 'newPassword', label: 'Nueva Contraseña', type: 'password', required: true },
+  { name: 'confirmPassword', label: 'Confirmar Contraseña', type: 'password', required: true },
+];
+
+
 export const roles = [
   { name: 'name', label: 'Nombre del Rol', type: 'text', required: true },
   { name: 'description', label: 'Descripción', type: 'text', required: false },

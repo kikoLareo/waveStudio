@@ -2,14 +2,19 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Table from '../components/Table/Table';
 import Modal from '../components/Modal/Modal';
 import DynamicForm from '../components/Form/DynamicForm';
+import ConfirmDeleteModal from '../components/Modal/ConfirmDeleteModal';
+import ErrorModal from '../components/Modal/ErrorModal';
 import api from '../services/api';
 import logService from '../utils/logger';
+import { FaTrash } from 'react-icons/fa';
 
-const GenericPage = ({ entityName, fetchUrl, createSchema, updateSchema }) => {
+const GenericPage = ({ entityName, fetchUrl, componentSchema, updateSchema = null }) => {
   const [items, setItems] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [isErrorModalOpen, setErrorModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
-  const [schema, setSchema] = useState(createSchema);
+  const [schema, setSchema] = useState(componentSchema);
   const [error, setError] = useState(null);
 
   const fetchItems = useCallback(async () => {
@@ -20,33 +25,45 @@ const GenericPage = ({ entityName, fetchUrl, createSchema, updateSchema }) => {
     } catch (error) {
       setError(`Error al obtener ${entityName}s`);
       logService.log('error', `Error al obtener ${entityName}s`, error);
+      setErrorModalOpen(true);
     }
-  }, [fetchUrl, entityName]); // Depende solo de `fetchUrl` y `entityName`
+  }, [fetchUrl, entityName]);
 
   useEffect(() => {
     fetchItems();
-  }, [fetchItems]); // Ahora puedes incluir fetchItems como dependencia
+  }, [fetchItems]);
 
   const handleCreate = () => {
     setCurrentItem({});
-    setSchema(createSchema);
+    setSchema(componentSchema);
     setModalOpen(true);
   };
 
   const handleEdit = (item) => {
     setCurrentItem(item);
-    setSchema(updateSchema);
+    setSchema(updateSchema || componentSchema);
     setModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
+  const confirmDelete = (item) => {
+    setCurrentItem(item);
+    setConfirmModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!currentItem || !currentItem.id) return;
+
     try {
-      await api.delete(`${fetchUrl}/delete/${id}`);
+      await api.delete(`${fetchUrl}/${currentItem.id}/delete`);
       fetchItems();
-      logService.log('info', `${entityName} con ID ${id} eliminado exitosamente`);
+      logService.log('info', `${entityName} con ID ${currentItem.id} eliminado exitosamente`);
     } catch (error) {
       setError(`Error al eliminar el ${entityName}`);
-      logService.log('error', `Error al eliminar el ${entityName} con ID ${id}`, error);
+      logService.log('error', `Error al eliminar el ${entityName} con ID ${currentItem.id}`, error);
+      setErrorModalOpen(true);
+    } finally {
+      setConfirmModalOpen(false);
+      setModalOpen(false);
     }
   };
 
@@ -64,27 +81,46 @@ const GenericPage = ({ entityName, fetchUrl, createSchema, updateSchema }) => {
     } catch (error) {
       setError(`Error al crear o actualizar el ${entityName}`);
       logService.log('error', `Error al crear o actualizar el ${entityName}`, error);
+      setErrorModalOpen(true);
     }
   };
 
   return (
-    <div>
+    <div style={{ padding: "0 20px" }}>
       <h1>Gestión de {entityName}s</h1>
-      {error && <div className="error-message">{error}</div>}
-      <button onClick={handleCreate}>Crear {entityName}</button>
+      <button onClick={handleCreate} style={{ margin: "10px 0" }}>Crear {entityName}</button>
       <Table
-        columns={createSchema}
+        columns={componentSchema.filter((field) => field.name !== 'password')}
         data={items}
         onEdit={handleEdit}
-        onDelete={handleDelete}
       />
+      {/* Modal de formulario */}
       <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
         <DynamicForm
           schema={schema}
           onSubmit={handleFormSubmit}
           initialData={currentItem}
         />
+        {currentItem && currentItem.id && (
+          <div className='deleteBtn-container'>
+            <button  className="btn-danger" onClick={() => confirmDelete(currentItem)} style={{ marginTop: "10px" }}>
+            <FaTrash />
+            </button>
+          </div>
+        )}
       </Modal>
+      <ConfirmDeleteModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setConfirmModalOpen(false)}
+        onConfirm={handleDelete}
+        entityName={entityName}
+      />
+      {/* Modal de errores */}
+      <ErrorModal
+        isOpen={isErrorModalOpen}
+        onClose={() => setErrorModalOpen(false)}
+        message={error}
+      />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 // src/routes.js
 import React from 'react';
 import GenericPage from './pages/GenericPage';
-import {users ,roles,  championships,  jobPositions,  organizers,  disciplines, championshipAssignments} from './schemas/schemas';
+import {users, userUpdateSchema ,roles,  championships,  jobPositions,  organizers,  disciplines, championshipAssignments} from './schemas/schemas';
 
 const routes = [
   {
@@ -10,7 +10,8 @@ const routes = [
       <GenericPage
         entityName="Usuario"
         fetchUrl="/users"
-        createSchema={users}
+        componentSchema={users}
+        updateSchema={userUpdateSchema}
       />
     ),
   },
@@ -20,7 +21,7 @@ const routes = [
       <GenericPage
         entityName="Rol"
         fetchUrl="/roles"
-        createSchema={roles}
+        componentSchema={roles}
       />
     ),
   },
@@ -30,7 +31,7 @@ const routes = [
       <GenericPage
         entityName="Campeonato"
         fetchUrl="/championships"
-        createSchema={championships}
+        componentSchema={championships}
       />
     ),
   },
@@ -40,7 +41,7 @@ const routes = [
       <GenericPage
         entityName="Puesto de Trabajo"
         fetchUrl="/job-positions"
-        createSchema={jobPositions}
+        componentSchema={jobPositions}
       />
     ),
   },
@@ -50,7 +51,7 @@ const routes = [
       <GenericPage
         entityName="Organizador"
         fetchUrl="/organizers"
-        createSchema={organizers}
+        componentSchema={organizers}
       />
     ),
   },
@@ -60,7 +61,7 @@ const routes = [
       <GenericPage
         entityName="Disciplina"
         fetchUrl="/disciplines"
-        createSchema={disciplines}
+        componentSchema={disciplines}
       />
     ),
   },
@@ -70,7 +71,7 @@ const routes = [
         <GenericPage
           entityName="Asignación de Campeonato"
           fetchUrl="/championship-assignments"
-          createSchema={championshipAssignments}
+          componentSchema={championshipAssignments}
         />
       ),
     }

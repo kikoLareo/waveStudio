@@ -1,19 +1,26 @@
-// src/components/Table/TableRow.js
+// src/components/Table/TableRow.jsx
 import React from 'react';
+import { FaEdit, FaEye } from 'react-icons/fa'; // Iconos para editar y ver
+import './Table.scss';
 
-function TableRow({ data, columns, onView, onEdit, onDelete }) {
+function TableRow({ data, columns, onView, onEdit }) {
   return (
-    <tr>
-      {columns.map((column) => (
-        <td key={column.name}>{data[column.name]}</td>
+    <>
+      {data.map((row, index) => (
+        <tr key={index}>
+          {columns.map((column) => (
+            <td key={column.name}>{row[column.name]}</td>
+          ))}
+          <td className="action-icons">
+          <button onClick={() => onEdit(row)} className="icon-button">
+            <FaEdit title="Editar" />
+          </button>
+          </td>
+        </tr>
       ))}
-      <td className="actions">
-        <button onClick={() => onView(data)}>Ver</button>
-        <button onClick={() => onEdit(data)}>Editar</button>
-        <button onClick={() => onDelete(data.id)}>Eliminar</button>
-      </td>
-    </tr>
+    </>
   );
-}
+};
 
 export default TableRow;
+
