@@ -1,4 +1,4 @@
-interface SchemaField {
+export interface SchemaField {
   name: string;
   label: string;
   type: 'text' | 'email' | 'password' | 'date' | 'number' | 'bdComponent';
@@ -48,6 +48,12 @@ export const championshipAssignments: SchemaField[] = [
 
 export const organizers: SchemaField[] = [
   { name: 'name', label: 'Nombre del Organizador', type: 'text', required: true },
+  { name: 'description', label: 'Descripción', type: 'text', required: false },
+  {name: 'placement', label: 'Ubicación', type: 'text', required: false},
+  {name: 'phone', label: 'Teléfono', type: 'text', required: false},
+  {name: 'email', label: 'Email', type: 'email', required: false},
+  {name: 'website', label: 'Sitio Web', type: 'text', required: false},
+  
 ];
 
 export const disciplines: SchemaField[] = [
@@ -55,7 +61,7 @@ export const disciplines: SchemaField[] = [
   { name: 'category', label: 'Categoría', type: 'text', required: false },
 ];
 
-type SchemaName = 'users' | 'userUpdate' | 'roles' | 'championships' | 'jobPositions' | 'championshipAssignments' | 'organizers' | 'disciplines';
+export type SchemaName = 'users' | 'userUpdate' | 'roles' | 'championships' | 'jobPositions' | 'championshipAssignments' | 'organizers' | 'disciplines';
 
 export const returnSchema = (schemaName: SchemaName): SchemaField[] => {
   const schemas: Record<SchemaName, SchemaField[]> = {

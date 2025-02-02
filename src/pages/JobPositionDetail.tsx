@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getComponentById } from '../services/componentService';
 import { 
   ArrowLeft,
   Briefcase,
@@ -49,7 +50,10 @@ const JobPositionDetail: React.FC = () => {
   useEffect(() => {
     const fetchPositionDetails = async () => {
       try {
-        const response = await api.get(`/job-positions/${id}`);
+        if (!id) {
+          throw new Error('ID is undefined');
+        }
+        const response = await getComponentById(`job-positions`, id);
         setPosition(response.data);
         logService.log('info', `Detalles del puesto ${id} obtenidos exitosamente`);
       } catch (error) {

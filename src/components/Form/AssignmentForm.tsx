@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, Briefcase, Clock } from 'lucide-react';
 import api from '../../services/api';
 import logService from '../../utils/logService';
+import { getComponents } from '../../services/componentService';
 
 interface User {
   id: string;
@@ -45,9 +46,9 @@ const AssignmentForm: React.FC<AssignmentFormProps> = ({
     const fetchData = async () => {
       try {
         const [usersRes, championshipsRes, jobPositionsRes] = await Promise.all([
-          api.get('/users'),
-          api.get('/championships'),
-          api.get('/job-positions'),
+          getComponents('users'),
+          getComponents('championships'),
+          getComponents('job-positions'),
         ]);
 
         setUsers(usersRes.data);

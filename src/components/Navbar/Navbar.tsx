@@ -30,7 +30,8 @@ const Navbar: React.FC = () => {
       icon: Trophy,
       children: [
         { name: 'Lista', href: '/championships' },
-        { name: 'Asignaciones', href: '/assignments' }
+        { name: 'Asignaciones', href: '/assignments' },
+        {name: 'Organizadores', href: '/organizers'},
       ]
     },
     {

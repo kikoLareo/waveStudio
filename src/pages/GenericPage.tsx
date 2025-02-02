@@ -8,6 +8,7 @@ import ErrorModal from '../components/Modal/ErrorModal';
 import api from '../services/api';
 import logService from '../utils/logService';
 import type { SchemaField } from '../schemas/schemas';
+import { getComponents } from '../services/componentService';
 
 interface GenericPageProps {
   entityName: string;
@@ -53,7 +54,7 @@ const GenericPage: React.FC<GenericPageProps> = ({
   const fetchItems = useCallback(async () => {
     logService.log('info', 'Iniciando fetchItems', { entityName, fetchUrl });
     try {
-      const response = await api.get(fetchUrl);
+      const response = await getComponents(entityName);
       logService.log('info', `Datos de ${entityName} obtenidos exitosamente`, {
         itemCount: response.data.length,
         firstItem: response.data[0]
@@ -111,22 +112,6 @@ const GenericPage: React.FC<GenericPageProps> = ({
     }
   };
 
-  const handleCellClick = (item: any, column: SchemaField) => {
-    logService.log('info', `Click en celda de ${entityName}`, { 
-      itemId: item.id,
-      column: column.name,
-      bdComponent: column.bdComponent
-    });
-
-    if (onCellClick) {
-      onCellClick(item, column);
-    } else if (column.bdComponent && item[`${column.name}_id`]) {
-      const targetUrl = `/${column.bdComponent}/${item[`${column.name}_id`]}`;
-      logService.log('info', `Navegando a componente relacionado`, { targetUrl });
-      navigate(targetUrl);
-    }
-  };
-
   const handleSubmit = async (formData: any) => {
     logService.log('info', `Iniciando envío de formulario de ${entityName}`, { 
       isEdit: !!currentItem?.id,
@@ -153,7 +138,7 @@ const GenericPage: React.FC<GenericPageProps> = ({
     }
   };
 
-  const processedData = transformData ? transformData(items) : items;
+  const processedData = transformData ? transformData(items) : (groupBy ? {} : items);
 
   logService.log('info', 'Renderizando tabla', {
     entityName,
@@ -176,7 +161,7 @@ const GenericPage: React.FC<GenericPageProps> = ({
       {groupBy ? (
         <GroupedTable
           columns={componentSchema}
-          data={processedData}
+          data={processedData as Record<string, any[]>}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onView={onView}
@@ -188,12 +173,11 @@ const GenericPage: React.FC<GenericPageProps> = ({
       ) : (
         <Table
           columns={componentSchema}
-          data={processedData}
+          data={Array.isArray(processedData) ? processedData : []}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onView={onView}
           onRowClick={handleRowClick}
-          onCellClick={handleCellClick}
           isLoading={isLoading}
         />
       )}

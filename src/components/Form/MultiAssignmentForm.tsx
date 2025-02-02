@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Minus, Users, Briefcase } from 'lucide-react';
 import api from '../../services/api';
 import logService from '../../utils/logService';
+import { getComponents } from '../../services/componentService';
 
 interface User {
   id: string;
@@ -42,8 +43,8 @@ const MultiAssignmentForm: React.FC<MultiAssignmentFormProps> = ({
     const fetchData = async () => {
       try {
         const [usersRes, jobPositionsRes] = await Promise.all([
-          api.get('/users'),
-          api.get('/job-positions')
+          getComponents('users'),
+          getComponents('job-positions')
         ]);
 
         setUsers(usersRes.data);

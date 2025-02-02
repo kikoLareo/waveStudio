@@ -9,6 +9,8 @@ import ChampionshipDetail from './pages/ChampionshipDetail';
 import Assignments from './pages/Assignments';
 import JobPositions from './pages/JobPositions';
 import JobPositionDetail from './pages/JobPositionDetail';
+import OrganizerPage from './pages/Organizers';
+import OrganizerDetail from './pages/OrganizerDetail';
 
 const routes = [
   {
@@ -50,7 +52,15 @@ const routes = [
   {
     path: '/job-positions/:id',
     element: <JobPositionDetail />
-  }
+  },
+  {
+    path: 'organizers',
+    element: <OrganizerPage />
+  },
+  {
+    path: 'organizers/:id',
+    element: <OrganizerDetail />
+  },
 ];
 
 export default routes;

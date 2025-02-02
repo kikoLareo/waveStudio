@@ -3,6 +3,7 @@ import { Search, ChevronDown, Loader, X } from 'lucide-react';
 import { useDebounce } from '../../hooks/useDebounce';
 import api from '../../services/api';
 import logService from '../../utils/logService';
+import { getComponentById } from '../../services/componentService';
 
 interface Option {
   id: string | number;
@@ -68,7 +69,7 @@ const SelectWithSearch: React.FC<SelectWithSearchProps> = ({
     const fetchSelectedOption = async () => {
       if (value && !selectedOption) {
         try {
-          const response = await api.get(`/${bdComponent}/${value}`);
+          const response = await getComponentById(bdComponent, value.toString());
           setSelectedOption(response.data);
         } catch (error) {
           logService.log('error', `Error al obtener opción seleccionada`, { error });

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import logService from '../utils/logService';
 import { endpoints } from '../config/api';
+import { getComponentById } from '../services/componentService';
 
 interface ChampionshipData {
   id: string;
@@ -31,7 +32,7 @@ export const useChampionship = (id?: string) => {
 
       try {
         setIsLoading(true);
-        const response = await api.get(endpoints.championships.details(id));
+        const response = await getComponentById(`championship`, endpoints.championships.details(id));
         setChampionship(response.data);
         logService.log('info', `Detalles del campeonato ${id} obtenidos exitosamente`);
       } catch (error) {

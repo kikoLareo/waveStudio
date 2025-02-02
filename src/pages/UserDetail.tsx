@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getComponentById } from '../services/componentService';
 import { 
   ArrowLeft,
   User,
@@ -48,7 +49,10 @@ const UserDetail: React.FC = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await api.get(`/users/${id}`);
+        if (!id) {
+          throw new Error('ID is undefined');
+        }
+        const response = await getComponentById(`users`, id);
         setUser(response.data);
         logService.log('info', `Detalles del usuario ${id} obtenidos exitosamente`);
       } catch (error) {

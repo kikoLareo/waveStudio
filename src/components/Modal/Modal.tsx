@@ -38,6 +38,8 @@ const Modal: React.FC<ModalProps> = ({
   }, [isOpen, onClose]);
 
   const handleBackdropClick = (event: React.MouseEvent) => {
+    // Evitar que se propague el clic a otros modales
+    event.stopPropagation();
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
       onClose();
     }
@@ -45,7 +47,7 @@ const Modal: React.FC<ModalProps> = ({
 
   if (!isOpen) return null;
 
-  const sizeClasses = {
+  const sizeClasses: Record<string, string> = {
     sm: 'max-w-md',
     md: 'max-w-lg',
     lg: 'max-w-2xl',
@@ -65,25 +67,18 @@ const Modal: React.FC<ModalProps> = ({
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           aria-hidden="true"
         />
-
         <div
           ref={modalRef}
-          className={`
-            relative transform overflow-hidden rounded-lg bg-white text-left
-            shadow-xl transition-all sm:my-8 w-full ${sizeClasses[size]}
-          `}
+          className={`relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 w-full ${sizeClasses[size]}`}
+          onClick={e => e.stopPropagation()} // Evita propagación de clics dentro del modal
         >
           {title && (
             <div className="border-b border-gray-200 px-6 py-4">
-              <h3
-                className="text-lg font-medium text-gray-900"
-                id="modal-title"
-              >
+              <h3 className="text-lg font-medium text-gray-900" id="modal-title">
                 {title}
               </h3>
             </div>
           )}
-
           <button
             onClick={onClose}
             className="absolute right-4 top-4 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -91,7 +86,6 @@ const Modal: React.FC<ModalProps> = ({
           >
             <X className="h-5 w-5" />
           </button>
-
           <div className="px-6 py-4">
             {children}
           </div>
