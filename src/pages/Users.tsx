@@ -52,7 +52,8 @@ const Users: React.FC = () => {
       </h1>
       
       <GenericPage
-        entityName="Usuario"
+        entityId='users'
+        entityName="Usuarios"
         componentSchema={displaySchema}
         onRowClick={handleRowClick}
         onCellClick={handleCellClick}

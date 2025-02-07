@@ -11,6 +11,7 @@ import type { SchemaField } from '../schemas/schemas';
 import { getComponents } from '../services/componentService';
 
 interface GenericPageProps {
+  entityId: string;
   entityName: string;
   componentSchema: SchemaField[];
   updateSchema?: SchemaField[] | null;
@@ -24,6 +25,7 @@ interface GenericPageProps {
 }
 
 const GenericPage: React.FC<GenericPageProps> = ({
+  entityId,
   entityName,
   componentSchema,
   updateSchema = null,
@@ -46,6 +48,7 @@ const GenericPage: React.FC<GenericPageProps> = ({
   const fetchUrl = window.location.pathname;
 
   logService.log('info', 'GenericPage inicializado', {
+    entityId,
     entityName,
     fetchUrl,
     schemaFields: componentSchema.map(f => f.name)
@@ -54,14 +57,18 @@ const GenericPage: React.FC<GenericPageProps> = ({
   const fetchItems = useCallback(async () => {
     logService.log('info', 'Iniciando fetchItems', { entityName, fetchUrl });
     try {
-      const response = await getComponents(entityName);
+      const response = await getComponents(entityId);
+      logService.log('info', `Datos de ${entityName} obtenidos exitosamente`, {
+        response: response,
+      });
+
       logService.log('info', `Datos de ${entityName} obtenidos exitosamente`, {
         itemCount: response.data.length,
         firstItem: response.data[0]
       });
       setItems(response.data);
     } catch (error) {
-      const errorMessage = `Error al obtener ${entityName}s`;
+      const errorMessage = `Error al obtener ${entityName}`;
       setError(errorMessage);
       logService.log('error', errorMessage, { error, fetchUrl });
       setErrorModalOpen(true);
@@ -125,7 +132,7 @@ const GenericPage: React.FC<GenericPageProps> = ({
           itemId: currentItem.id 
         });
       } else {
-        await api.post(fetchUrl, formData);
+        await api.post(`${fetchUrl}/create`, formData);
         logService.log('info', `${entityName} creado exitosamente`);
       }
       setModalOpen(false);

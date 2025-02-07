@@ -203,7 +203,7 @@ const UserDetail: React.FC = () => {
 
         {/* Asignaciones */}
         <div className="p-8 border-t border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">Asignaciones</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-6">Trabajos</h2>
           
           {user.assignments && user.assignments.length > 0 ? (
             <div className="overflow-x-auto">

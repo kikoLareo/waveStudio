@@ -32,6 +32,7 @@ const Navbar: React.FC = () => {
         { name: 'Lista', href: '/championships' },
         { name: 'Asignaciones', href: '/assignments' },
         {name: 'Organizadores', href: '/organizers'},
+        {name: 'Disciplinas', href: '/disciplines'}
       ]
     },
     {

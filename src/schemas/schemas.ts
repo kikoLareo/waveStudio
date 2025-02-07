@@ -42,7 +42,7 @@ export const jobPositions: SchemaField[] = [
 export const championshipAssignments: SchemaField[] = [
   { name: 'user_id', label: 'Usuario', type: 'bdComponent', required: true, bdComponent: 'users' },
   { name: 'championship_id', label: 'Campeonato', type: 'bdComponent', required: true, bdComponent: 'championships' },
-  { name: 'job_position_id', label: 'Puesto de Trabajo', type: 'bdComponent', required: true, bdComponent: 'job_positions' },
+  { name: 'job_position_id', label: 'Puesto de Trabajo', type: 'bdComponent', required: true, bdComponent: 'job-positions' },
   { name: 'hours_worked', label: 'Horas Trabajadas', type: 'number', required: true },
 ];
 

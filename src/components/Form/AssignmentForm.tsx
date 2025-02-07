@@ -54,7 +54,7 @@ const AssignmentForm: React.FC<AssignmentFormProps> = ({
         setUsers(usersRes.data);
         setChampionships(championshipsRes.data);
         setJobPositions(jobPositionsRes.data);
-        logService.log('info', 'Datos del formulario cargados exitosamente');
+
       } catch (error) {
         logService.log('error', 'Error al cargar los datos del formulario', { error });
       } finally {

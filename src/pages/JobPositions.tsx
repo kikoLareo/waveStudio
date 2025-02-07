@@ -26,6 +26,7 @@ const JobPositionsPage: React.FC = () => {
       </h1>
       
       <GenericPage
+        entityId='job-positions'
         entityName="Puesto de Trabajo"
         componentSchema={jobPositions}
         onRowClick={handleRowClick}

@@ -11,6 +11,8 @@ import JobPositions from './pages/JobPositions';
 import JobPositionDetail from './pages/JobPositionDetail';
 import OrganizerPage from './pages/Organizers';
 import OrganizerDetail from './pages/OrganizerDetail';
+import DisciplinePage from './pages/Disciplines';
+import DisciplineDetail from './pages/DisciplineDetail';
 
 const routes = [
   {
@@ -61,6 +63,9 @@ const routes = [
     path: 'organizers/:id',
     element: <OrganizerDetail />
   },
+  {path: 'disciplines', element: <DisciplinePage />},
+  {path: 'disciplines/:id', element: <DisciplineDetail />}
+
 ];
 
 export default routes;

@@ -26,6 +26,7 @@ const RolesPage: React.FC = () => {
       </h1>
       
       <GenericPage
+        entityId='roles'
         entityName="Rol"
         componentSchema={roles}
         onRowClick={handleRowClick}

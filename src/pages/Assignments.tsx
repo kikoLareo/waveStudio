@@ -126,6 +126,7 @@ const AssignmentsPage: React.FC = () => {
       </div>
 
       <GenericPage
+        entityId='assignments'
         entityName="Asignación"
         componentSchema={displaySchema}
         groupBy={groupBy}

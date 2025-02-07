@@ -1,4 +1,5 @@
 // componentService.ts
+import logService from '../utils/logService';
 import api from './api';
 
 /**
@@ -7,8 +8,9 @@ import api from './api';
  * @returns Una promesa que resuelve con los datos obtenidos.
  */
 export const getComponents = async (component: string): Promise<any> => {
+  logService.log('info', 'Recuperando datos del componente:', { component });
   const response = await api.get(`/${component}`);
-  return response.data;
+  return response;
 };
 
 /**
@@ -19,7 +21,7 @@ export const getComponents = async (component: string): Promise<any> => {
  */
 export const getComponentById = async (component: string, id: string): Promise<any> => {
   const response = await api.get(`/${component}/${id}`);
-  return response.data;
+  return response;
 };
 
 /**

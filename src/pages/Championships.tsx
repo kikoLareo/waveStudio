@@ -45,6 +45,7 @@ const ChampionshipsPage: React.FC = () => {
       </h1>
       
       <GenericPage
+        entityId='championships'
         entityName="Campeonato"
         componentSchema={championships}
         onRowClick={handleRowClick}
