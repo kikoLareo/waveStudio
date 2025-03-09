@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Menu,
   X,
@@ -9,14 +9,49 @@ import {
   Briefcase,
   ChevronDown,
   LogOut,
-  Settings
+  Settings,
+  UserCog,
+  Shield
 } from 'lucide-react';
+import logService from '../../utils/logService';
+import { useAuth } from '../../context/AuthContext';
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  roles?: number[];
+}
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isMaster, setIsMaster] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Usar el contexto de autenticación
+  const { user: authUser, isAuthenticated, logout: authLogout } = useAuth();
+  
+  // Actualizar el estado local cuando cambia el usuario autenticado
+  useEffect(() => {
+    if (authUser) {
+      setUser(authUser);
+      // Verificar si el usuario es Master (asumiendo que el rol Master tiene ID 1)
+      setIsMaster(authUser.roles && authUser.roles.includes(1));
+    }
+  }, [authUser]);
+
+  // Función para cerrar sesión
+  const handleLogout = () => {
+    // Usar la función de logout del contexto de autenticación
+    authLogout();
+    
+    // Registrar logout
+    logService.log('info', 'Usuario cerró sesión', { username: user?.username });
+  };
 
   const navigation = [
     { 
@@ -42,7 +77,8 @@ const Navbar: React.FC = () => {
       children: [
         { name: 'Usuarios', href: '/users' },
         { name: 'Roles', href: '/roles' },
-        { name: 'Puestos', href: '/job-positions' }
+        { name: 'Puestos', href: '/job-positions' },
+        ...(isMaster ? [{ name: 'Gestión de Usuarios', href: '/user-management' }] : [])
       ]
     }
   ];
@@ -155,7 +191,7 @@ const Navbar: React.FC = () => {
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                     alt="Profile"
                   />
-                  <span className="text-sm font-medium">Admin</span>
+                  <span className="text-sm font-medium">{user?.username || 'Usuario'}</span>
                   <ChevronDown className="h-4 w-4" />
                 </button>
 
@@ -178,9 +214,21 @@ const Navbar: React.FC = () => {
                           <span>Configuración</span>
                         </div>
                       </Link>
+                      {isMaster && (
+                        <Link
+                          to="/user-management"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <UserCog className="h-4 w-4" />
+                            <span>Gestión de Usuarios</span>
+                          </div>
+                        </Link>
+                      )}
                       <button
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => {/* Lógica de logout */}}
+                        onClick={handleLogout}
                       >
                         <div className="flex items-center space-x-2">
                           <LogOut className="h-4 w-4" />
@@ -291,8 +339,8 @@ const Navbar: React.FC = () => {
                 />
               </div>
               <div className="ml-3">
-                <div className="text-base font-medium text-gray-800">Admin</div>
-                <div className="text-sm font-medium text-gray-500">admin@wavestudio.com</div>
+                <div className="text-base font-medium text-gray-800">{user?.username || 'Usuario'}</div>
+                <div className="text-sm font-medium text-gray-500">{user?.email || 'usuario@wavestudio.com'}</div>
               </div>
             </div>
             <div className="mt-3 px-2 space-y-1">
@@ -313,9 +361,21 @@ const Navbar: React.FC = () => {
                   <span>Configuración</span>
                 </div>
               </Link>
+              {isMaster && (
+                <Link
+                  to="/user-management"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <div className="flex items-center space-x-2">
+                    <UserCog className="h-5 w-5" />
+                    <span>Gestión de Usuarios</span>
+                  </div>
+                </Link>
+              )}
               <button
                 className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100"
-                onClick={() => {/* Lógica de logout */}}
+                onClick={handleLogout}
               >
                 <div className="flex items-center space-x-2">
                   <LogOut className="h-5 w-5" />

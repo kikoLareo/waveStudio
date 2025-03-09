@@ -87,7 +87,7 @@ const Table: React.FC<TableProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <div className="bg-white rounded-lg shadow overflow-visible">
       <div className="p-4 border-b border-gray-200">
         <div className="relative">
           <input
@@ -181,11 +181,11 @@ const Table: React.FC<TableProps> = ({
                         </button>
 
                         {activeDropdown === index && (
-                          <div className="
-                            absolute right-0 mt-2 w-48
-                            bg-white rounded-md shadow-lg z-10
+                          <div className={`
+                            fixed right-5 w-48
+                            bg-white rounded-md shadow-lg z-50
                             ring-1 ring-black ring-opacity-5
-                          ">
+                          `}>
                             <div className="py-1" role="menu">
                               {onView && (
                                 <button

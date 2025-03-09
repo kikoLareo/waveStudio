@@ -11,13 +11,12 @@ import {
   Calendar,
   User,
   Mail,
-  Clock,
-  Save
+  Clock
 } from 'lucide-react';
-import api from '../services/api';
 import logService from '../utils/logService';
-import DynamicForm from '../components/Form/DynamicForm';
 import { returnSchema } from '../schemas/schemas';
+import useInlineEdit from '../hooks/useInlineEdit';
+import InlineEditSection from '../components/InlineEdit/InlineEditSection';
 
 interface Permission {
   resource: string;
@@ -43,15 +42,14 @@ interface RoleData {
   users: RoleUser[];
 }
 
-const RoleDetail: React.FC = () => {
+const RoleDetailRefactored: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [role, setRole] = useState<RoleData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState<Partial<RoleData> | null>(null);
 
+  // Función para cargar los detalles del rol
   const fetchRoleDetails = async () => {
     setLoading(true);
     try {
@@ -70,6 +68,21 @@ const RoleDetail: React.FC = () => {
     }
   };
 
+  // Usar el hook personalizado para la edición en línea
+  const {
+    isEditing,
+    editData,
+    startEditing,
+    cancelEditing,
+    saveChanges
+  } = useInlineEdit<RoleData>({
+    onRefresh: fetchRoleDetails,
+    endpoint: 'roles/update',
+    id,
+    successMessage: `Rol ${id} actualizado exitosamente`,
+    errorMessage: 'Error al actualizar el rol'
+  });
+
   useEffect(() => {
     if (id) {
       fetchRoleDetails();
@@ -80,44 +93,19 @@ const RoleDetail: React.FC = () => {
     navigate(`/users/${userId}`);
   };
 
-  // Verificar si una acción está permitida para un recurso
-  const hasPermission = (resource: Permission, action: string): boolean => {
-    return Array.isArray(resource.actions) && resource.actions.includes(action);
-  };
-
   const handleEditClick = () => {
     if (role) {
-      setEditData({
+      startEditing({
         name: role.name,
         description: role.description,
         // Añadir otros campos según sea necesario
       });
-      setIsEditing(true);
     }
   };
 
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setEditData(null);
-  };
-
-  const handleSaveChanges = async (formData: Partial<RoleData>) => {
-    try {
-      if (!id) return;
-      
-      await api.put(`/roles/update/${id}`, formData);
-      logService.log('info', `Rol ${id} actualizado exitosamente`);
-      
-      // Recargar los datos para mostrar los cambios
-      await fetchRoleDetails();
-      
-      // Volver al modo visualización
-      setIsEditing(false);
-      setEditData(null);
-    } catch (error) {
-      logService.log('error', 'Error al actualizar el rol', { error });
-      throw error;
-    }
+  // Verificar si una acción está permitida para un recurso
+  const hasPermission = (resource: Permission, action: string): boolean => {
+    return Array.isArray(resource.actions) && resource.actions.includes(action);
   };
 
   if (loading) {
@@ -140,6 +128,35 @@ const RoleDetail: React.FC = () => {
 
   const permissionActions = ['read', 'write', 'delete'] as const;
 
+  // Componente de visualización para el encabezado
+  const HeaderViewComponent = (
+    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center">
+        <div className="h-16 w-16 bg-purple-100 rounded-full flex items-center justify-center">
+          <Shield className="h-8 w-8 text-purple-600" />
+        </div>
+        <div className="ml-4">
+          <h1 className="text-2xl font-bold text-gray-900">{role.name}</h1>
+          <p className="text-gray-500">{role.description}</p>
+        </div>
+      </div>
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
+          <Users className="h-5 w-5 text-gray-400" />
+          <span className="text-sm text-gray-600">
+            {role.userCount} usuarios
+          </span>
+        </div>
+        <button
+          onClick={handleEditClick}
+          className="p-2 text-gray-400 hover:text-gray-600"
+        >
+          <Edit className="h-5 w-5" />
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <button
@@ -151,45 +168,16 @@ const RoleDetail: React.FC = () => {
       </button>
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        {/* Encabezado */}
-        {isEditing ? (
-          <div className="p-8 border-b border-gray-200">
-            <DynamicForm
-              schema={returnSchema('roles').filter(field => ['name', 'description'].includes(field.name))}
-              initialData={editData || {}}
-              onSubmit={handleSaveChanges}
-              onCancel={handleCancelEdit}
-            />
-          </div>
-        ) : (
-          <div className="p-8 border-b border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                <div className="h-16 w-16 bg-purple-100 rounded-full flex items-center justify-center">
-                  <Shield className="h-8 w-8 text-purple-600" />
-                </div>
-                <div className="ml-4">
-                  <h1 className="text-2xl font-bold text-gray-900">{role.name}</h1>
-                  <p className="text-gray-500">{role.description}</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <Users className="h-5 w-5 text-gray-400" />
-                  <span className="text-sm text-gray-600">
-                    {role.userCount} usuarios
-                  </span>
-                </div>
-                <button
-                  onClick={handleEditClick}
-                  className="p-2 text-gray-400 hover:text-gray-600"
-                >
-                  <Edit className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Encabezado con edición en línea */}
+        <InlineEditSection
+          isEditing={isEditing}
+          editData={editData}
+          schema={returnSchema('roles').filter(field => ['name', 'description'].includes(field.name))}
+          onSave={saveChanges}
+          onCancel={cancelEditing}
+          viewComponent={HeaderViewComponent}
+          className="p-8 border-b border-gray-200"
+        />
 
         {/* Permisos */}
         <div className="p-8 border-b border-gray-200">
@@ -301,4 +289,4 @@ const RoleDetail: React.FC = () => {
   );
 };
 
-export default RoleDetail;
+export default RoleDetailRefactored;

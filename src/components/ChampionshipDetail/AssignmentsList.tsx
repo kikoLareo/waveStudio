@@ -1,19 +1,20 @@
 import React from 'react';
 import { Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import Table from '../Table/Table';
+import FilterableTable from '../Table/FilterableTable';
 import logService from '../../utils/logService';
+import { SchemaField } from '../../schemas/schemas';
 
 interface Assignment {
   id: string;
   userId: string;
   userName: string;
   position: string;
-  job_position_id: string;
   hoursWorked: number;
-  status: string;
-  startDate: string;
-  endDate: string;
+  job_position_id?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 interface AssignmentsListProps {
@@ -23,12 +24,12 @@ interface AssignmentsListProps {
 const AssignmentsList: React.FC<AssignmentsListProps> = ({ assignments }) => {
   const navigate = useNavigate();
 
-  const columns = [
-    { name: 'userName', label: 'Usuario', bdComponent: 'users' },
-    { name: 'position', label: 'Posición', bdComponent: 'job-positions' },
-    { name: 'hoursWorked', label: 'Horas Trabajadas', type: 'number' },
-    { name: 'status', label: 'Estado', type: 'text' },
-    { name: 'period', label: 'Periodo', type: 'text' }
+  const columns: SchemaField[] = [
+    { name: 'userName', label: 'Usuario', type: 'bdComponent', required: false, bdComponent: 'users' },
+    { name: 'position', label: 'Posición', type: 'bdComponent', required: false, bdComponent: 'job-positions' },
+    { name: 'hoursWorked', label: 'Horas Trabajadas', type: 'number', required: false },
+    { name: 'status', label: 'Estado', type: 'text', required: false },
+    { name: 'period', label: 'Periodo', type: 'text', required: false }
   ];
 
   const handleRowClick = (item: Assignment) => {
@@ -39,18 +40,17 @@ const AssignmentsList: React.FC<AssignmentsListProps> = ({ assignments }) => {
     navigate(`/assignments/${item.id}`);
   };
 
-  const handleCellClick = (item: Assignment, column: any) => {
-    logService.log('info', 'Click en celda de asignación', {
-      assignmentId: item.id,
-      column: column.name,
-      bdComponent: column.bdComponent,
-      item
-    });
+  const handleView = (item: Assignment) => {
+    navigate(`/assignments/${item.id}`);
+  };
 
-    if (column.bdComponent === 'users') {
-      navigate(`/users/${item.userId}`);
-    } else if (column.bdComponent === 'job-positions') {
-      navigate(`/job-positions/${item.job_position_id}`);
+  const handleUserNavigation = (userId: string) => {
+    navigate(`/users/${userId}`);
+  };
+
+  const handleJobPositionNavigation = (jobPositionId: string) => {
+    if (jobPositionId) {
+      navigate(`/job-positions/${jobPositionId}`);
     }
   };
 
@@ -69,19 +69,49 @@ const AssignmentsList: React.FC<AssignmentsListProps> = ({ assignments }) => {
   // Procesar los datos para incluir el período formateado
   const processedData = assignments.map(assignment => {
     logService.log('debug', 'Procesando asignación', { assignment });
+    
+    // Usar fechas por defecto si no están disponibles
+    const startDate = assignment.startDate ? new Date(assignment.startDate) : new Date();
+    const endDate = assignment.endDate ? new Date(assignment.endDate) : new Date();
+    
     return {
       ...assignment,
-      period: `${new Date(assignment.startDate).toLocaleDateString()} - ${new Date(assignment.endDate).toLocaleDateString()}`
+      status: assignment.status || 'Activo',
+      period: `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`
     };
   });
 
+  // Definir los filtros para la tabla
+  const filters = [
+    {
+      field: 'status',
+      type: 'select' as const,
+      label: 'Estado',
+      options: [
+        { label: 'Activo', value: 'Activo' },
+        { label: 'Inactivo', value: 'Inactivo' }
+      ]
+    },
+    {
+      field: 'userName',
+      type: 'text' as const,
+      label: 'Usuario'
+    },
+    {
+      field: 'startDate',
+      type: 'date-range' as const,
+      label: 'Fecha de inicio'
+    }
+  ];
+
   return (
-    <Table
+    <FilterableTable
       columns={columns}
       data={processedData}
       onRowClick={handleRowClick}
-      onCellClick={handleCellClick}
-      showActions={false}
+      onView={handleView}
+      showActions={true}
+      filters={filters}
     />
   );
 };

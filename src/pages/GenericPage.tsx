@@ -9,11 +9,15 @@ import api from '../services/api';
 import logService from '../utils/logService';
 import type { SchemaField } from '../schemas/schemas';
 import { getComponents } from '../services/componentService';
+import { AppError, getFriendlyErrorMessage } from '../utils/errorHandler';
+import { processApiError, ApiErrorResponse } from '../utils/apiErrorHandler';
+import { AxiosError } from 'axios';
 
 interface GenericPageProps {
   entityId: string;
   entityName: string;
   componentSchema: SchemaField[];
+  createSchema?: SchemaField[] | null;
   updateSchema?: SchemaField[] | null;
   onView?: (item: any) => void;
   onRowClick?: (item: any) => void;
@@ -28,6 +32,7 @@ const GenericPage: React.FC<GenericPageProps> = ({
   entityId,
   entityName,
   componentSchema,
+  createSchema = null,
   updateSchema = null,
   onView,
   onRowClick,
@@ -42,8 +47,9 @@ const GenericPage: React.FC<GenericPageProps> = ({
   const [isModalOpen, setModalOpen] = useState(false);
   const [isErrorModalOpen, setErrorModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<any | null>(null);
-  const [schema, setSchema] = useState<SchemaField[]>(componentSchema);
-  const [error, setError] = useState<string | null>(null);
+  const [schema, setSchema] = useState<SchemaField[]>( componentSchema);
+  const [error, setError] = useState<AppError | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const fetchUrl = window.location.pathname;
 
@@ -59,18 +65,14 @@ const GenericPage: React.FC<GenericPageProps> = ({
     try {
       const response = await getComponents(entityId);
       logService.log('info', `Datos de ${entityName} obtenidos exitosamente`, {
-        response: response,
-      });
-
-      logService.log('info', `Datos de ${entityName} obtenidos exitosamente`, {
         itemCount: response.data.length,
         firstItem: response.data[0]
       });
       setItems(response.data);
     } catch (error) {
-      const errorMessage = `Error al obtener ${entityName}`;
-      setError(errorMessage);
-      logService.log('error', errorMessage, { error, fetchUrl });
+      const appError = processApiError(error as AxiosError<ApiErrorResponse>, `obtener ${entityName}`);
+      setError(appError);
+      setErrorMessage(getFriendlyErrorMessage(appError));
       setErrorModalOpen(true);
     } finally {
       setIsLoading(false);
@@ -84,7 +86,7 @@ const GenericPage: React.FC<GenericPageProps> = ({
   const handleCreate = () => {
     logService.log('info', `Iniciando creación de ${entityName}`);
     setCurrentItem(null);
-    setSchema(componentSchema);
+    setSchema(createSchema || componentSchema);
     setModalOpen(true);
   };
 
@@ -98,13 +100,13 @@ const GenericPage: React.FC<GenericPageProps> = ({
   const handleDelete = async (item: any) => {
     logService.log('info', `Iniciando eliminación de ${entityName}`, { itemId: item.id });
     try {
-      await api.delete(`${fetchUrl}/${item.id}`);
+      await api.delete(`${fetchUrl}/delete/${item.id}`);
       logService.log('info', `${entityName} eliminado exitosamente`, { itemId: item.id });
       fetchItems();
     } catch (error) {
-      const errorMessage = `Error al eliminar ${entityName}`;
-      setError(errorMessage);
-      logService.log('error', errorMessage, { error, itemId: item.id });
+      const appError = processApiError(error as AxiosError<ApiErrorResponse>, `eliminar ${entityName}`);
+      setError(appError);
+      setErrorMessage(getFriendlyErrorMessage(appError));
       setErrorModalOpen(true);
     }
   };
@@ -132,15 +134,20 @@ const GenericPage: React.FC<GenericPageProps> = ({
           itemId: currentItem.id 
         });
       } else {
-        await api.post(`${fetchUrl}/create`, formData);
+        const response = await api.post(`${fetchUrl}/create`, formData);
         logService.log('info', `${entityName} creado exitosamente`);
+        if (response.data && response.data.id) {
+          navigate(`${fetchUrl}/${response.data.id}`);
+        }
       }
       setModalOpen(false);
       fetchItems();
     } catch (error) {
-      const errorMessage = `Error al ${currentItem?.id ? 'actualizar' : 'crear'} ${entityName}`;
-      setError(errorMessage);
-      logService.log('error', errorMessage, { error, formData });
+      const action = currentItem?.id ? 'actualizar' : 'crear';
+      const appError = processApiError(error as AxiosError<ApiErrorResponse>, `${action} ${entityName}`);
+      setError(appError);
+      setErrorMessage(getFriendlyErrorMessage(appError));
+      logService.log('error', `Error al ${action} ${entityName}`, { error: appError, formData });
       setErrorModalOpen(true);
     }
   };
@@ -204,7 +211,7 @@ const GenericPage: React.FC<GenericPageProps> = ({
       <ErrorModal
         isOpen={isErrorModalOpen}
         onClose={() => setErrorModalOpen(false)}
-        message={error || `Ha ocurrido un error al procesar la operación`}
+        message={errorMessage || `Ha ocurrido un error al procesar la operación`}
       />
     </div>
   );

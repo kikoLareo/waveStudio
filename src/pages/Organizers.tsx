@@ -8,7 +8,7 @@ const OrganizerPage: React.FC = () => {
 
   // Manejar clic en una fila de rol
   const handleRowClick = (item: any) => {
-    navigate(`/organizer/${item.id}`);
+    navigate(`/organizers/${item.id}`);
   };
 
 

@@ -4,6 +4,9 @@ import Roles from './pages/Roles';
 import RoleDetail from './pages/RoleDetail';
 import Users from './pages/Users';
 import UserDetail from './pages/UserDetail';
+import UserManagement from './pages/UserManagement';
+import UserSettings from './pages/UserSettings';
+import Login from './pages/Login';
 import Championships from './pages/Championships';
 import ChampionshipDetail from './pages/ChampionshipDetail';
 import Assignments from './pages/Assignments';
@@ -13,59 +16,95 @@ import OrganizerPage from './pages/Organizers';
 import OrganizerDetail from './pages/OrganizerDetail';
 import DisciplinePage from './pages/Disciplines';
 import DisciplineDetail from './pages/DisciplineDetail';
+import SeedDataPage from './pages/SeedData';
+import ProtectedRoute from './components/ProtectedRoute';
+
+// Definir IDs de roles (estos deberían coincidir con los IDs en la base de datos)
+const ROLE_IDS = {
+  MASTER: 1, // Asumiendo que el rol Master tiene ID 1
+  USER: 2    // Asumiendo que el rol Usuario normal tiene ID 2
+};
 
 const routes = [
+  // Ruta pública para login
+  {
+    path: '/login',
+    element: <Login />
+  },
+  // Rutas protegidas que requieren autenticación
   {
     path: '/',
-    element: <Dashboard />
+    element: <ProtectedRoute><Dashboard /></ProtectedRoute>
+  },
+  {
+    path: '/dashboard',
+    element: <ProtectedRoute><Dashboard /></ProtectedRoute>
   },
   {
     path: '/roles',
-    element: <Roles />
+    element: <ProtectedRoute><Roles /></ProtectedRoute>
   },
   {
     path: '/roles/:id',
-    element: <RoleDetail />
+    element: <ProtectedRoute><RoleDetail /></ProtectedRoute>
   },
   {
     path: '/users',
-    element: <Users />
+    element: <ProtectedRoute><Users /></ProtectedRoute>
   },
   {
     path: '/users/:id',
-    element: <UserDetail />
+    element: <ProtectedRoute><UserDetail /></ProtectedRoute>
+  },
+  // Ruta para gestión de usuarios (solo para usuarios Master)
+  {
+    path: '/user-management',
+    element: <ProtectedRoute requiredRoles={[ROLE_IDS.MASTER]}><UserManagement /></ProtectedRoute>
   },
   {
     path: '/championships',
-    element: <Championships />
+    element: <ProtectedRoute><Championships /></ProtectedRoute>
   },
   {
     path: '/championships/:id',
-    element: <ChampionshipDetail />
+    element: <ProtectedRoute><ChampionshipDetail /></ProtectedRoute>
   },
   {
     path: '/assignments',
-    element: <Assignments />
+    element: <ProtectedRoute><Assignments /></ProtectedRoute>
   },
   {
     path: '/job-positions',
-    element: <JobPositions />
+    element: <ProtectedRoute><JobPositions /></ProtectedRoute>
   },
   {
     path: '/job-positions/:id',
-    element: <JobPositionDetail />
+    element: <ProtectedRoute><JobPositionDetail /></ProtectedRoute>
   },
   {
-    path: 'organizers',
-    element: <OrganizerPage />
+    path: '/organizers',
+    element: <ProtectedRoute><OrganizerPage /></ProtectedRoute>
   },
   {
-    path: 'organizers/:id',
-    element: <OrganizerDetail />
+    path: '/organizers/:id',
+    element: <ProtectedRoute><OrganizerDetail /></ProtectedRoute>
   },
-  {path: 'disciplines', element: <DisciplinePage />},
-  {path: 'disciplines/:id', element: <DisciplineDetail />}
-
+  {
+    path: '/disciplines', 
+    element: <ProtectedRoute><DisciplinePage /></ProtectedRoute>
+  },
+  {
+    path: '/disciplines/:id', 
+    element: <ProtectedRoute><DisciplineDetail /></ProtectedRoute>
+  },
+  {
+    path: '/seed-data', 
+    element: <ProtectedRoute requiredRoles={[ROLE_IDS.MASTER]}><SeedDataPage /></ProtectedRoute>
+  },
+  {
+    path: '/settings',
+    element: <ProtectedRoute><UserSettings /></ProtectedRoute>
+  }
 ];
 
 export default routes;

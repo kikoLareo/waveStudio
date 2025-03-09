@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Trophy, Briefcase } from 'lucide-react';
-import { championshipAssignments } from '../schemas/schemas';
+import { championshipAssignments, championshipAssignmentsCreate } from '../schemas/schemas';
 import GenericPage from './GenericPage';
 
 interface Assignment {
@@ -24,13 +24,13 @@ const AssignmentsPage: React.FC = () => {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
   const displaySchema = championshipAssignments.map(field => {
-    if (field.name === 'user_id') {
+    if (field.name === 'username') {
       return { ...field, name: 'userName', label: 'Usuario' };
     }
-    if (field.name === 'championship_id') {
+    if (field.name === 'championship_name') {
       return { ...field, name: 'championshipName', label: 'Campeonato' };
     }
-    if (field.name === 'job_position_id') {
+    if (field.name === 'job_position_name') {
       return { ...field, name: 'positionTitle', label: 'Puesto de Trabajo' };
     }
     return field;
@@ -128,7 +128,8 @@ const AssignmentsPage: React.FC = () => {
       <GenericPage
         entityId='assignments'
         entityName="Asignación"
-        componentSchema={displaySchema}
+        componentSchema={championshipAssignments}
+        createSchema={championshipAssignmentsCreate}
         groupBy={groupBy}
         onToggleGroup={toggleGroup}
         expandedGroups={expandedGroups}

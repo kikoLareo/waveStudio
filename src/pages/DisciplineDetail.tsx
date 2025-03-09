@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import logService from '../utils/logService';
+import { useAuth } from '../context/AuthContext';
 
 interface DisciplineData {
   id: string;
@@ -34,7 +35,10 @@ const DisciplineDetail: React.FC = () => {
   const [discipline, setDiscipline] = useState<DisciplineData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [editMode, setEditMode] = useState(false);
+  const { hasRole } = useAuth();
+  
+  const canEdit =  hasRole(1) || hasRole(2);
   useEffect(() => {
     const fetchDisciplineDetails = async () => {
       try {
@@ -64,6 +68,18 @@ const DisciplineDetail: React.FC = () => {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
+  }
+
+  const handleEdit = async () => {
+    try {
+      await api.put(`disciplines/${id}/update`, discipline);
+      logService.log('info', `Organizador ${id} actualizado exitosamente`);
+      setEditMode(false);
+    } catch (error) {
+      const errorMessage = 'Error al actualizar el organizador';
+      setError(errorMessage);
+      logService.log('error', errorMessage, { error });
+    }
   }
 
   if (error || !discipline) {
@@ -96,74 +112,47 @@ const DisciplineDetail: React.FC = () => {
         {/* Encabezado */}
         <div className="p-8 border-b border-gray-200 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{discipline.name}</h1>
-            <p className="text-gray-500 mt-2">{discipline.description}</p>
+            {/* Nombre de la Disciplina */}
+            {editMode ? (
+              <input
+                type="text"
+                value={discipline.name}
+                autoFocus
+                onChange={(e) => setDiscipline({ ...discipline, name: e.target.value })}
+                className="text-2xl font-bold text-gray-900 focus:outline-none background-gray-50 border-b border-gray-200"
+              />
+            ) : (
+              <h1 className="text-2xl font-bold text-gray-900">{discipline.name}</h1>
+            )}
+
           </div>
-          <button
-            onClick={() => navigate(`/disciplines/edit/${discipline.id}`)}
-            className="p-2 text-gray-400 hover:text-gray-600"
-          >
-            <Edit className="h-5 w-5" />
-          </button>
+          {/* Botón de Editar */}
+          {canEdit && (
+            <button
+              onClick={() => setEditMode(!editMode)}
+              className="p-2 text-gray-400 hover:text-gray-600"
+            >
+              <Edit className="h-5 w-5" />
+            </button>
+          )}
         </div>
 
         {/* Detalles del Organizador */}
         <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
-            <div className="flex items-center space-x-3">
-              <Phone className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="text-sm text-gray-500">Teléfono</p>
-                <p className="text-gray-900">{discipline.phone}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Mail className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="text-sm text-gray-500">Email</p>
-                <p className="text-gray-900">{discipline.email}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Globe className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="text-sm text-gray-500">Sitio Web</p>
-                <p className="text-gray-900">
-                  <a
-                    href={discipline.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    {discipline.website}
-                  </a>
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <MapPin className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="text-sm text-gray-500">Ubicación</p>
-                <p className="text-gray-900">{discipline.placement}</p>
-              </div>
-            </div>
           </div>
-
-          {/* Mapa (si existe ubicación) */}
-          {mapUrl && (
-            <div className="rounded-lg overflow-hidden shadow">
-              <iframe
-                title="Mapa de ubicación"
-                src={mapUrl}
-                width="100%"
-                height="300"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-              ></iframe>
-            </div>
-          )}
         </div>
+
+        {editMode && (
+          <div className="p-8 bg-gray-50 border-t border-gray-200">
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+              onClick={handleEdit}
+            >
+              Guardar Cambios
+            </button>
+          </div>
+        )}
 
         {/* Información Adicional */}
         <div className="p-8 bg-gray-50 border-t border-gray-200">

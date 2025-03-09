@@ -8,7 +8,7 @@ const disciplinePage: React.FC = () => {
 
   // Manejar clic en una fila de rol
   const handleRowClick = (item: any) => {
-    navigate(`/discipline/${item.id}`);
+    navigate(`/disciplines/${item.id}`);
   };
 
 

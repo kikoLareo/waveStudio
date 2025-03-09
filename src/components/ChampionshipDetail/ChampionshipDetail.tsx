@@ -1,16 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, Users, Award, DollarSign, ClipboardList, ChevronDown } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Users, Award, DollarSign, ClipboardList, UserPlus, X } from 'lucide-react';
 import { AsyncBoundary } from '../../boundary';
 import { useChampionship } from '../../hooks/useChampionship';
 import AssignmentsList from './AssignmentsList';
 import CostsSummary from './CostsSummary';
+import AddAssignmentForm from '../Form/AddAssignmentForm';
+import Breadcrumbs from '../Breadcrumbs';
+
+interface Assignment {
+  id: string;
+  userId: string;
+  userName: string;
+  position: string;
+  job_position_id: string;
+  hoursWorked: number;
+  status: string;
+  startDate: string;
+  endDate: string;
+}
 
 const ChampionshipDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { championship, isLoading, error } = useChampionship(id);
   const [activeTab, setActiveTab] = useState<'info' | 'assignments' | 'costs'>('info');
+  const [showAddPersonnel, setShowAddPersonnel] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const tabs = [
     { id: 'info', label: 'Información', icon: Award },
@@ -18,10 +34,30 @@ const ChampionshipDetail: React.FC = () => {
     { id: 'costs', label: 'Costos', icon: DollarSign },
   ] as const;
 
+  const handleAddPersonnelSuccess = () => {
+    setShowAddPersonnel(false);
+    // Trigger a refresh by updating the key
+    setRefreshKey(prev => prev + 1);
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'assignments':
-        return <AssignmentsList assignments={championship?.assignments || []} />;
+        return (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-medium text-gray-900">Asignaciones</h2>
+              <button
+                onClick={() => setShowAddPersonnel(true)}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <UserPlus className="mr-2 h-4 w-4" />
+                Añadir Personal
+              </button>
+            </div>
+            <AssignmentsList assignments={championship?.assignments || []} />
+          </div>
+        );
       case 'costs':
         return <CostsSummary championshipId={id} />;
       default:
@@ -55,14 +91,49 @@ const ChampionshipDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Modal para añadir personal */}
+      {showAddPersonnel && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="absolute top-0 right-0 pt-4 pr-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAddPersonnel(false)}
+                  className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <span className="sr-only">Cerrar</span>
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+              
+              <div className="p-6">
+                <AddAssignmentForm
+                  championshipId={id || ''}
+                  onSuccess={handleAddPersonnelSuccess}
+                  onCancel={() => setShowAddPersonnel(false)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <button
-          onClick={() => navigate(-1)}
-          className="group flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 mb-8"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-          Volver a Campeonatos
-        </button>
+        <div className="mb-8">
+          <Breadcrumbs 
+            items={[
+              { label: 'Campeonatos', path: '/championships' },
+              { label: championship?.name || 'Detalle de Campeonato', path: `/championships/${id}` }
+            ]} 
+          />
+        </div>
 
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="px-8 py-6 border-b border-gray-200">

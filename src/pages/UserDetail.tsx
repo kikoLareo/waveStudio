@@ -11,10 +11,13 @@ import {
   Edit,
   Key,
   Trophy,
-  Briefcase
+  Briefcase,
+  X
 } from 'lucide-react';
 import api from '../services/api';
 import logService from '../utils/logService';
+import DynamicForm from '../components/Form/DynamicForm';
+import { returnSchema } from '../schemas/schemas';
 
 interface Assignment {
   id: string;
@@ -45,25 +48,28 @@ const UserDetail: React.FC = () => {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState<Partial<UserData> | null>(null);
+
+  const fetchUserDetails = async () => {
+    setLoading(true);
+    try {
+      if (!id) {
+        throw new Error('ID is undefined');
+      }
+      const response = await getComponentById(`users`, id);
+      setUser(response.data);
+      logService.log('info', `Detalles del usuario ${id} obtenidos exitosamente`);
+    } catch (error) {
+      const errorMessage = 'Error al obtener los detalles del usuario';
+      setError(errorMessage);
+      logService.log('error', errorMessage, { error });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        if (!id) {
-          throw new Error('ID is undefined');
-        }
-        const response = await getComponentById(`users`, id);
-        setUser(response.data);
-        logService.log('info', `Detalles del usuario ${id} obtenidos exitosamente`);
-      } catch (error) {
-        const errorMessage = 'Error al obtener los detalles del usuario';
-        setError(errorMessage);
-        logService.log('error', errorMessage, { error });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (id) {
       fetchUserDetails();
     }
@@ -75,6 +81,42 @@ const UserDetail: React.FC = () => {
 
   const handleAssignmentClick = (assignmentId: string) => {
     navigate(`/assignments/${assignmentId}`);
+  };
+
+  const handleEditClick = () => {
+    if (user) {
+      setEditData({
+        username: user.username,
+        email: user.email,
+        active: user.active,
+        // Añadir otros campos según sea necesario
+      });
+      setIsEditing(true);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditData(null);
+  };
+
+  const handleSaveChanges = async (formData: Partial<UserData>) => {
+    try {
+      if (!id) return;
+      
+      await api.put(`/users/${id}/update`, formData);
+      logService.log('info', `Usuario ${id} actualizado exitosamente`);
+      
+      // Recargar los datos para mostrar los cambios
+      await fetchUserDetails();
+      
+      // Volver al modo visualización
+      setIsEditing(false);
+      setEditData(null);
+    } catch (error) {
+      logService.log('error', 'Error al actualizar el usuario', { error });
+      throw error;
+    }
   };
 
   if (loading) {
@@ -107,33 +149,44 @@ const UserDetail: React.FC = () => {
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Encabezado */}
-        <div className="p-8 border-b border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center">
-                <User className="h-8 w-8 text-blue-600" />
+        {isEditing ? (
+          <div className="p-8 border-b border-gray-200">
+            <DynamicForm
+              schema={returnSchema('users').filter(field => ['username', 'email', 'active'].includes(field.name))}
+              initialData={editData || {}}
+              onSubmit={handleSaveChanges}
+              onCancel={handleCancelEdit}
+            />
+          </div>
+        ) : (
+          <div className="p-8 border-b border-gray-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center">
+                  <User className="h-8 w-8 text-blue-600" />
+                </div>
+                <div className="ml-4">
+                  <h1 className="text-2xl font-bold text-gray-900">{user.username}</h1>
+                  <p className="text-gray-500">{user.email}</p>
+                </div>
               </div>
-              <div className="ml-4">
-                <h1 className="text-2xl font-bold text-gray-900">{user.username}</h1>
-                <p className="text-gray-500">{user.email}</p>
+              <div className="flex items-center space-x-4">
+                <span className={`
+                  px-3 py-1 rounded-full text-sm font-medium
+                  ${user.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}
+                `}>
+                  {user.active ? 'Activo' : 'Inactivo'}
+                </span>
+                <button
+                  onClick={handleEditClick}
+                  className="p-2 text-gray-400 hover:text-gray-600"
+                >
+                  <Edit className="h-5 w-5" />
+                </button>
               </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className={`
-                px-3 py-1 rounded-full text-sm font-medium
-                ${user.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}
-              `}>
-                {user.active ? 'Activo' : 'Inactivo'}
-              </span>
-              <button
-                onClick={() => navigate(`/users/edit/${user.id}`)}
-                className="p-2 text-gray-400 hover:text-gray-600"
-              >
-                <Edit className="h-5 w-5" />
-              </button>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Información del Usuario */}
         <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">

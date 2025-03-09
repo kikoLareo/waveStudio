@@ -5,12 +5,16 @@ import logService from '../../utils/logService';
 import { SchemaField, returnSchema, SchemaName } from '../../schemas/schemas';
 import Modal from '../Modal/Modal';
 import { getComponents } from '../../services/componentService';
+import { handleFormErrors } from '../../utils/formErrorHandler';
+import { AxiosError } from 'axios';
+import { ApiErrorResponse } from '../../utils/apiErrorHandler';
 
 interface DynamicFormProps {
   schema: SchemaField[];
   initialData?: Record<string, any>;
   onSubmit: (data: Record<string, any>) => Promise<void> | void;
   onDelete?: () => void;
+  onCancel?: () => void;
   /** Opcional: callback para actualizar las opciones de un campo en el formulario padre */
   onNewOptionCreated?: (fieldName: string, newOption: { value: string; label: string }) => void;
 }
@@ -25,6 +29,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   initialData = {},
   onSubmit,
   onDelete,
+  onCancel,
   onNewOptionCreated
 }) => {
   const [formData, setFormData] = useState<Record<string, any>>(initialData);
@@ -45,7 +50,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
             const response = await getComponents(`${field.bdComponent}`);
             newOptions[field.name] = response.data.map((item: any) => ({
               value: item.id,
-              label: item.name || item.title
+              label: item.name || item.title || item.username
             }));
           } catch (error) {
             logService.log('error', `Error fetching options for ${field.name}`, { error });
@@ -89,6 +94,20 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
         await onSubmit(formData);
       } catch (error) {
         logService.log('error', 'Error submitting form', { error });
+        
+        // Procesar errores de validación del backend
+        if (error && (error as AxiosError).response) {
+          const fieldErrors = handleFormErrors(error as AxiosError<ApiErrorResponse>);
+          setErrors(fieldErrors);
+          
+          // Si hay un error general, mostrarlo en un campo especial
+          if (fieldErrors._general) {
+            setErrors(prev => ({
+              ...prev,
+              _general: fieldErrors._general
+            }));
+          }
+        }
       } finally {
         setIsLoading(false);
       }
@@ -194,27 +213,49 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
         </div>
       ))}
 
+      {/* Mensaje de error general */}
+      {errors._general && (
+        <div className="p-3 bg-red-50 rounded-md">
+          <p className="text-sm text-red-600 flex items-center">
+            <AlertCircle className="h-4 w-4 mr-1 flex-shrink-0" />
+            <span>{errors._general}</span>
+          </p>
+        </div>
+      )}
+
       <div className="flex justify-between pt-4">
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-        >
-          {isLoading ? (
-            <span className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-              Guardando...
-            </span>
-          ) : (
-            'Guardar'
+        <div className="flex space-x-3">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                Guardando...
+              </span>
+            ) : (
+              'Guardar'
+            )}
+          </button>
+          
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Cancelar
+            </button>
           )}
-        </button>
+        </div>
 
         {onDelete && (
           <button
             type="button"
             onClick={onDelete}
-            className="ml-3 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -228,13 +269,14 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
         title={`${currentField ? 'Crear' : 'Nuevo'} ${currentField?.label}`}
       >
         <DynamicForm
-          // Usamos el schema específico del componente relacionado
-          schema={
-            currentField?.bdComponent
-              ? returnSchema(currentField.bdComponent as SchemaName)
-              : []
-          }
-          onSubmit={handleNewItemSubmit}
+      // Usamos el schema específico del componente relacionado
+      schema={
+        currentField?.bdComponent
+          ? returnSchema(currentField.bdComponent as SchemaName)
+          : []
+      }
+      onSubmit={handleNewItemSubmit}
+      onCancel={() => setIsNewModalOpen(false)}
         />
       </Modal>
     </form>
