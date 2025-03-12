@@ -18,6 +18,7 @@ import DisciplinePage from './pages/Disciplines';
 import DisciplineDetail from './pages/DisciplineDetail';
 import SeedDataPage from './pages/SeedData';
 import ProtectedRoute from './components/ProtectedRoute';
+import AssignmentDetail from './pages/AssignmentDetail';
 
 // Definir IDs de roles (estos deberían coincidir con los IDs en la base de datos)
 const ROLE_IDS = {
@@ -72,6 +73,10 @@ const routes = [
   {
     path: '/assignments',
     element: <ProtectedRoute><Assignments /></ProtectedRoute>
+  },
+  {
+    path : '/assignments/:id',
+    element: <ProtectedRoute><AssignmentDetail/></ProtectedRoute>
   },
   {
     path: '/job-positions',

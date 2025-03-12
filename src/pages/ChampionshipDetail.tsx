@@ -319,13 +319,12 @@ const ChampionshipDetail: React.FC = () => {
                     {isEditing ? (
                       <DynamicSelect
                       resourceName="disciplines"
-                      value={editData?.discipline_id ?? ''}
-                      onChange={(selectedItem: { id: number; name: string }) => {
+                      value={editData?.discipline_id ?? 0}
+                      onChange={(value) => {
                         setEditData({
                           ...editData,
-                          discipline_id: selectedItem.id,
-                          discipline_name: selectedItem.name
-                        });
+                          discipline_id: value.id,
+                          discipline_name: value.name,});
                       }}
                       label="Disciplina"
                       placeholder="Seleccione una disciplina"
@@ -345,12 +344,13 @@ const ChampionshipDetail: React.FC = () => {
                     {isEditing ? (
                       <DynamicSelect
                       resourceName="organizers"
-                      value={championship.organizer_id}
-                      onChange={(selectedItem: { id: number; name: string }) => {
+                      value={editData?.organizer_id ?? 0}
+                      onChange={(selectedItem ) => {
+                        logService.log('info', 'Organizador seleccionado', { selectedItem });
                         setEditData({
                           ...editData,
                           organizer_id: selectedItem.id,
-                          organizer_name: selectedItem.name
+                          organizer_name: selectedItem.name,
                         });
                       }}
                       label="Organizador"

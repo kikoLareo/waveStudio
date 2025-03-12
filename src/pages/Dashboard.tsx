@@ -15,7 +15,7 @@ interface Championship {
 
 interface User {
   id: number;
-  name: string;
+  username: string;
   email: string;
   role_id: number;
 }
@@ -80,7 +80,7 @@ const Dashboard = () => {
       return {
         ...assignment,
         championshipName: championship?.name || 'Desconocido',
-        userName: user?.name || 'Desconocido',
+        username: user?.username || 'Desconocido',
       };
     });
   };
@@ -271,7 +271,7 @@ const Dashboard = () => {
                           to={`/users/${assignment.user_id}`}
                           className="flex items-center text-blue-600 hover:text-blue-800"
                         >
-                          {assignment.userName}
+                          {assignment.username}
                           <ExternalLink className="ml-1 h-3 w-3" />
                         </Link>
                       </td>
@@ -355,7 +355,7 @@ const Dashboard = () => {
                           to={`/users/${user.id}`}
                           className="flex items-center text-blue-600 hover:text-blue-800"
                         >
-                          {user.name}
+                          {user.username}
                           <ExternalLink className="ml-1 h-3 w-3" />
                         </Link>
                       </td>

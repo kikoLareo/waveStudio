@@ -10,9 +10,9 @@ interface Assignment {
   championship_id: string;
   job_position_id: string;
   hours_worked: number;
-  userName: string;
-  championshipName: string;
-  positionTitle: string;
+  username: string;
+  championship_name: string;
+  job_position_name: string;
   status: string;
 }
 
@@ -61,13 +61,13 @@ const AssignmentsPage: React.FC = () => {
 
       switch (groupBy) {
         case 'user':
-          key = assignment.userName || 'Sin usuario';
+          key = assignment.username || 'Sin usuario';
           break;
         case 'championship':
-          key = assignment.championshipName || 'Sin campeonato';
+          key = assignment.championship_name || 'Sin campeonato';
           break;
         case 'position':
-          key = assignment.positionTitle || 'Sin puesto';
+          key = assignment.job_position_name || 'Sin puesto';
           break;
       }
 
