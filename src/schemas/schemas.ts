@@ -37,6 +37,9 @@ export const championships: SchemaField[] = [
 export const jobPositions: SchemaField[] = [
   { name: 'title', label: 'Título del Puesto', type: 'text', required: true },
   { name: 'description', label: 'Descripción', type: 'text', required: false },
+  { name: 'cost_per_day', label: 'Costo por Día', type: 'number', required: true },
+  { name: 'cost_per_hour', label: 'Costo por Hora', type: 'number', required: false },
+
 ];
 
 export const championshipAssignmentsCreate: SchemaField[] = [
