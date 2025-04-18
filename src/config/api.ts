@@ -10,7 +10,7 @@ interface ApiConfig {
 }
 
 export const apiConfig: ApiConfig = {
-  baseURL: import.meta.env.VITE_API_URL || 'https://api.wavestudio-backend.com',
+  baseURL: "",
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
