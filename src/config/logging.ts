@@ -15,7 +15,7 @@ export const logConfig: LogConfig = {
   persistToServer: import.meta.env.VITE_LOG_TO_SERVER !== 'false',
   maxLogSize: 5242880, // 5MB
   rotationCount: 5,
-  serverEndpoint: '/logs'
+  serverEndpoint: '/api/logs'
 };
 
 export const logLevels: Record<LogLevel, number> = {
