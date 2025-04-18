@@ -10,7 +10,7 @@ interface ApiConfig {
 }
 
 export const apiConfig: ApiConfig = {
-  baseURL: "",
+  baseURL: "/api",
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
